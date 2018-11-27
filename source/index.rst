@@ -21,7 +21,9 @@ The package is available under `MIT license <https://github.com/lingcorpora/ling
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
+   
+   api
 
 About
 ------

@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API &#8212; lingcorpora 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="lingcorpora 2.0 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to lingcorpora’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="api">
+<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-lingcorpora"></span><div class="section" id="corpus-object">
+<h2>Corpus object<a class="headerlink" href="#corpus-object" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="lingcorpora.corpus.Corpus">
+<em class="property">class </em><code class="descclassname">lingcorpora.corpus.</code><code class="descname">Corpus</code><span class="sig-paren">(</span><em>language</em>, <em>verbose=True</em>, <em>sleep_time=1</em>, <em>sleep_each=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lingcorpora/corpus.html#Corpus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lingcorpora.corpus.Corpus" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="lingcorpora.corpus.Corpus.reset_failed">
+<code class="descname">reset_failed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lingcorpora/corpus.html#Corpus.reset_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lingcorpora.corpus.Corpus.reset_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset <cite>.failed</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lingcorpora.corpus.Corpus.retry_failed">
+<code class="descname">retry_failed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lingcorpora/corpus.html#Corpus.retry_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lingcorpora.corpus.Corpus.retry_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply <cite>.search()</cite> to failed queries stored in <cite>.failed</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lingcorpora.corpus.Corpus.search">
+<code class="descname">search</code><span class="sig-paren">(</span><em>query</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lingcorpora/corpus.html#Corpus.search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lingcorpora.corpus.Corpus.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>query: str: query
+for arguments see <cite>params_container.Container</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lingcorpora.params_container.Container">
+<em class="property">class </em><code class="descclassname">lingcorpora.params_container.</code><code class="descname">Container</code><span class="sig-paren">(</span><em>query</em>, <em>n_results=100</em>, <em>kwic=True</em>, <em>n_left=None</em>, <em>n_right=None</em>, <em>subcorpus=None</em>, <em>get_analysis=False</em>, <em>gr_tags=None</em>, <em>query_language=None</em>, <em>start=0</em>, <em>writing_system=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lingcorpora/params_container.html#Container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lingcorpora.params_container.Container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Two arguments are universal:
+query: str or list[str]: query or queries
+n_results: int, optional, default 100: number of results wanted</p>
+<p>Other depend on the corpus:
+kwic: boolean, optional, default True: kwic format (True) or a sentence (False)
+n_left: int, optional: number of words / symbols (corpus-specific) in the left context
+n_right: int, optional: number of words / symbols (corpus-specific) in the right context
+subcorpus: str, optional: subcorpus to search in
+get_analysis: boolean, optional, default False: whether to download grammatical information if the corpus is annotated
+gr_tags: tags for grammar search
+query_language: str: for parallel corpora, language of the query
+start: int, optional, default 0: result index to start from
+writing_system: str, optional: writing system of results</p>
+</dd></dl>
+
+</div>
+<div class="section" id="working-with-results">
+<h2>Working with results<a class="headerlink" href="#working-with-results" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="lingcorpora.result.Result">
+<em class="property">class </em><code class="descclassname">lingcorpora.result.</code><code class="descname">Result</code><span class="sig-paren">(</span><em>language</em>, <em>query_params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lingcorpora/result.html#Result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lingcorpora.result.Result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="lingcorpora.target.Target">
+<em class="property">class </em><code class="descclassname">lingcorpora.target.</code><code class="descname">Target</code><span class="sig-paren">(</span><em>text</em>, <em>idxs</em>, <em>meta</em>, <em>analysis</em>, <em>gr_tags=None</em>, <em>transl=None</em>, <em>lang=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lingcorpora/target.html#Target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lingcorpora.target.Target" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="lingcorpora.target.Target.kwic">
+<code class="descname">kwic</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>level='word'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lingcorpora/target.html#Target.kwic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lingcorpora.target.Target.kwic" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>level: [&#8216;word&#8217;, &#8216;char&#8217;]: if &#8220;word&#8221; - split by words</dt>
+<dd>if &#8220;char&#8221; - split by characters</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API</a><ul>
+<li><a class="reference internal" href="#corpus-object">Corpus object</a></li>
+<li><a class="reference internal" href="#working-with-results">Working with results</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to lingcorpora&#8217;s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/api.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
