@@ -5,7 +5,7 @@
 
 Welcome to lingcorpora's documentation!
 =======================================
-_Build _PyPI _DOI
+Build_ PyPI_ DOI_
 
 .. |Build| image:: https://ci.appveyor.com/api/projects/status/4f5i7bwypma1gp29/branch/master?svg=true
 .. _Build: https://ci.appveyor.com/project/kategerasimenko/lingcorpora-py
