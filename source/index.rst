@@ -5,21 +5,41 @@
 
 Welcome to lingcorpora's documentation!
 =======================================
-Build_ PyPI_ DOI_
 
-.. |Build| image:: https://ci.appveyor.com/api/projects/status/4f5i7bwypma1gp29/branch/master?svg=true
-.. _Build: https://ci.appveyor.com/project/kategerasimenko/lingcorpora-py
+This package includes API for
 
-.. |PyPI| image:: https://badge.fury.io/py/lingcorpora.svg
-.. _PyPI: https://badge.fury.io/py/lingcorpora
+* National Corpus of Russian Language
+* Parallel subcorpus of National Corpus of Russian Language
+* Center of Chinese Linguistics corpus
+* Corpus Bambara de Reference
+* Maninka Automatically Parsed corpus
 
-.. |DOI| image:: https://zenodo.org/badge/115459241.svg
-.. _DOI: https://zenodo.org/badge/latestdoi/115459241
+R version of this package by George Moroz is located `here <https://github.com/lingcorpora/lingcorpora.R>`_.
+
+The package is available under `MIT license <https://github.com/lingcorpora/lingcorpora.py/blob/master/LICENSE>`_.
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
+
+About
+------
+
+The project is maintained by `George Moroz <https://github.com/agricolamz>`_ and several students of School of Linguistics of Higher School of Economics. At different stages, the following people have contributed to the project: Alexey Koshevoy, Mark Sobolev, Ekaterina Gerasimenko, Anna Zueva, Diana Malyshok, Artyom Kopetskiy, Maria Terekhina, Ustinya Kosheleva.
+
+
+Contributing
+------------
+
+Reporting a bug & requesting functionality
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can report a bug, ask a question or suggest adding features via `Issues <https://github.com/lingcorpora/lingcorpora.py/issues>`_ in the repository.
+
+Making new corpora and proposing changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You are welcome to suggest your improvements to the source code and make APIs for more corpora. You should propose changes via `pull requests <https://help.github.com/articles/about-pull-requests/>`_. Your code should fit into the overall structure, which is described `in the guide <https://lingcorpora.github.io/lingcorpora.py/lingcorpora_guide.html>`_.
 
 
 
