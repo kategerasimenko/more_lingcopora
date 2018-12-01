@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lingcorpora.corpora.bam_corpus &#8212; lingcorpora 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="lingcorpora 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for lingcorpora.corpora.bam_corpus</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">..params_container</span> <span class="k">import</span> <span class="n">Container</span>
+<span class="kn">from</span> <span class="nn">requests</span> <span class="k">import</span> <span class="n">get</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">html</span> <span class="k">import</span> <span class="n">unescape</span>
+<span class="kn">from</span> <span class="nn">..target</span> <span class="k">import</span> <span class="n">Target</span>
+
+<span class="n">TEST_DATA</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;test_single_query&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="s1">&#39;walasa&#39;</span><span class="p">},</span>
+             <span class="s1">&#39;test_multi_query&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;walasa&#39;</span><span class="p">,</span> <span class="s1">&#39;yɔrɔ&#39;</span><span class="p">]}</span>
+            <span class="p">}</span>
+
+<span class="n">__doc__</span> <span class="o">=</span> \
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">API for Bamana corpus (http://maslinsky.spb.ru/bonito/index.html).</span>
+<span class="sd">    </span>
+<span class="sd">Args:</span>
+<span class="sd">    query: str or List([str]): query or queries (currently only exact search by word or phrase is available)</span>
+<span class="sd">    n_results: int: number of results wanted (100 by default)</span>
+<span class="sd">    kwic: boolean: kwic format (True) or a sentence (False) (True by default)</span>
+<span class="sd">    get_analysis: boolean: whether to collect grammatical tags for target word or not (False by default, available only for corbama-net-non-tonal subcorpus)</span>
+<span class="sd">    subcorpus: str: subcorpus. Available options: &#39;corbama-net-non-tonal&#39;, &#39;corbama-net-tonal&#39;, &#39;corbama-brut&#39; (&#39;corbama-net-non-tonal&#39; by default)</span>
+<span class="sd">    </span>
+<span class="sd">Main function: extract</span>
+<span class="sd">Returns:</span>
+<span class="sd">    A generator of Target objects.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<div class="viewcode-block" id="PageParser"><a class="viewcode-back" href="../../../corpora.html#lingcorpora.corpora.bam_corpus.PageParser">[docs]</a><span class="k">class</span> <span class="nc">PageParser</span><span class="p">(</span><span class="n">Container</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">    API for Bamana corpus (http://maslinsky.spb.ru/bonito/index.html).</span>
+<span class="sd">        </span>
+<span class="sd">    Args:</span>
+<span class="sd">        query: str or List([str]): query or queries (currently only exact search by word or phrase is available)</span>
+<span class="sd">        n_results: int: number of results wanted (100 by default)</span>
+<span class="sd">        kwic: boolean: kwic format (True) or a sentence (False) (True by default)</span>
+<span class="sd">        get_analysis: boolean: whether to collect grammatical tags for target word or not (False by default, available only for corbama-net-non-tonal subcorpus)</span>
+<span class="sd">        subcorpus: str: subcorpus. Available options: &#39;corbama-net-non-tonal&#39;, &#39;corbama-net-tonal&#39;, &#39;corbama-brut&#39; (&#39;corbama-net-non-tonal&#39; by default)</span>
+<span class="sd">        </span>
+<span class="sd">    Main function: extract</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A generator of Target objects.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcorpus</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subcorpus</span> <span class="o">=</span> <span class="s1">&#39;corbama-net-non-tonal&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwic</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__viewmode</span> <span class="o">=</span> <span class="s1">&#39;kwic&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__viewmode</span> <span class="o">=</span> <span class="s1">&#39;sen&#39;</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">__page</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pagenum</span> <span class="o">=</span> <span class="mi">1</span>
+
+        
+    <span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;corpname&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcorpus</span><span class="p">,</span>
+            <span class="s2">&quot;iquery&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">,</span>
+            <span class="s2">&quot;fromp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pagenum</span><span class="p">,</span>
+            <span class="s2">&quot;viewmode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__viewmode</span>
+        <span class="p">}</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        create a query url and get results for one page</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://maslinsky.spb.ru/bonito/run.cgi/first&#39;</span><span class="p">,</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">unescape</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">parse_page</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        find results (and total number of results) in the page code</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__page</span><span class="p">,</span> <span class="s1">&#39;lxml&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div#error&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;tr&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pagenum</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_results</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;strong.add_commas&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)),</span><span class="bp">self</span><span class="o">.</span><span class="n">n_results</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+        
+    <span class="k">def</span> <span class="nf">extract_kws</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">kws</span><span class="p">):</span>
+        <span class="n">final_kws</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">kws</span><span class="p">:</span>
+            <span class="n">text_kw</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;span.nott&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div.aline&#39;</span><span class="p">)</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tag</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_analysis</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcorpus</span> <span class="o">==</span> <span class="s1">&#39;corbama-net-non-tonal&#39;</span><span class="p">:</span>
+                <span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;lemma&#39;</span><span class="p">:</span> <span class="n">tag</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="n">tag</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;gloss&#39;</span><span class="p">:</span> <span class="n">tag</span><span class="p">[</span><span class="mi">2</span><span class="p">]})</span>
+            <span class="n">final_kws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_kw</span><span class="p">)</span>
+        <span class="n">final_kws</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">final_kws</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">final_kws</span><span class="p">,</span> <span class="n">tags</span>
+
+
+    <span class="k">def</span> <span class="nf">parse_kwic_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">result</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        find hit and its left and right contexts</span>
+<span class="sd">        in the extracted row of table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lc</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;td.lc span.nott&#39;</span><span class="p">)])</span>
+        <span class="n">kws</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;td.kw div.token&#39;</span><span class="p">)</span>
+        <span class="n">final_kws</span><span class="p">,</span><span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_kws</span><span class="p">(</span><span class="n">kws</span><span class="p">)</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;td.rc span.nott&#39;</span><span class="p">)])</span>
+        
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">final_kws</span><span class="p">))</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">lc</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">final_kws</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">rc</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Target</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="n">idx</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">tags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span>
+ 
+ 
+    <span class="k">def</span> <span class="nf">parse_sen_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">result</span><span class="p">):</span>
+        <span class="n">sentence</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;td.par  &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcorpus</span> <span class="o">==</span> <span class="s1">&#39;corbama-net-non-tonal&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;token&#39;</span> <span class="ow">in</span> <span class="n">ch</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]:</span>
+                        <span class="n">w</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;span.nott&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                        <span class="n">text</span> <span class="o">+=</span> <span class="n">w</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+                    <span class="k">elif</span> <span class="n">ch</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;span&#39;</span><span class="p">:</span>
+                        <span class="n">kws</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div.token&#39;</span><span class="p">)</span>
+                        <span class="n">final_kws</span><span class="p">,</span><span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_kws</span><span class="p">(</span><span class="n">kws</span><span class="p">)</span>
+                        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">final_kws</span><span class="p">))</span>
+                        <span class="n">text</span> <span class="o">+=</span> <span class="n">final_kws</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lc</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;span.nott&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">rc</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;span.nott&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">kws</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;div.token&#39;</span><span class="p">)</span>
+            <span class="n">final_kws</span><span class="p">,</span><span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_kws</span><span class="p">(</span><span class="n">kws</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">final_kws</span><span class="p">))</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">lc</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">final_kws</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">rc</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Target</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="n">idx</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">tags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span>
+        
+
+    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_results</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_results</span><span class="p">()</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_page</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_results</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwic</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_kwic_result</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_sen_result</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">r</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__pagenum</span> <span class="o">+=</span> <span class="mi">1</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

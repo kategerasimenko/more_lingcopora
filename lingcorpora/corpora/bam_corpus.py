@@ -29,6 +29,22 @@ Returns:
 
 
 class PageParser(Container):
+    """
+        
+    API for Bamana corpus (http://maslinsky.spb.ru/bonito/index.html).
+        
+    Args:
+        query: str or List([str]): query or queries (currently only exact search by word or phrase is available)
+        n_results: int: number of results wanted (100 by default)
+        kwic: boolean: kwic format (True) or a sentence (False) (True by default)
+        get_analysis: boolean: whether to collect grammatical tags for target word or not (False by default, available only for corbama-net-non-tonal subcorpus)
+        subcorpus: str: subcorpus. Available options: 'corbama-net-non-tonal', 'corbama-net-tonal', 'corbama-brut' ('corbama-net-non-tonal' by default)
+        
+    Main function: extract
+    Returns:
+        A generator of Target objects.
+
+    """
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         if self.subcorpus is None:
